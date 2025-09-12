@@ -1,1 +1,0 @@
-# SpaApp-Test-Cypress
