@@ -11,5 +11,8 @@
     "name": "Test User",
     "email": "newuser@email.com",
     "password": "StrongPassword123!"
+  },
+  "WrongEmailformat": {
+    "email": "marwaazargui"
   }
 }
