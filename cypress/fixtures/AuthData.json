@@ -8,10 +8,10 @@
     "password": "wrongPassword"
   },
   "newUser": {
-    "name": "Test User",
-    "email": "newuser@email.com",
-    "password": "StrongPassword123!"
+    "email": "marwaazargui+Testing@gmail.com",
+    "password": "P@ssw0rd!"
   },
+  
   "WrongEmailformat": {
     "email": "marwaazargui"
   }
