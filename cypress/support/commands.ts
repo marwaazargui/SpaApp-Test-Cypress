@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
-import { registrationInfo } from "../fixtures/RegistrationData";
+import { registrationInfo } from "../fixtures/Auth-dependencies/RegistrationData";
+import 'cypress-file-upload';
 
 declare global {
   namespace Cypress {

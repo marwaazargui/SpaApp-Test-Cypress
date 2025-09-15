@@ -1,12 +1,12 @@
 /// <reference types="cypress" />
-import { registrationInfo } from "../../fixtures/RegistrationData";
+import { registrationInfo } from "../../fixtures/Auth-dependencies/RegistrationData";
 
 describe("Frontend Login Tests", () => {
   let auth: any;
   const apiUrl = Cypress.env("API_URL");
 
   beforeEach(() => {
-    cy.fixture("AuthData").then((data) => {
+    cy.fixture("Auth-dependencies/AuthData").then((data) => {
       auth = data;
     });
     cy.visit("auth/login");

@@ -1,4 +1,4 @@
-import { registrationInfo } from "../../fixtures/RegistrationData";
+import { registrationInfo } from "../../fixtures/Auth-dependencies/RegistrationData";
 
 function generateRandomEmail() {
   const timestamp = Date.now();
@@ -10,7 +10,7 @@ describe("Frontend Registration Tests", () => {
 
   beforeEach(() => {
     // Load fixture for auth data
-    cy.fixture("AuthData").then((data) => {
+    cy.fixture("Auth-dependencies/AuthData").then((data) => {
       auth = data;
     });
 
