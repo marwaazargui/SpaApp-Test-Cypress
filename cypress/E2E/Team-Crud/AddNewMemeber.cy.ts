@@ -66,7 +66,9 @@ describe("Frontend Registration Tests", () => {
 
     if (futureMonth > 11) return;
 
-    cy.get('button[role="combobox"]').contains("Select a year").click({ force: true });
+    cy.get('button[role="combobox"]')
+      .contains("Select a year")
+      .click({ force: true });
     cy.get('[role="option"]').contains(thisYear.toString()).click();
     cy.get('button[aria-haspopup="dialog"]').click();
     cy.get('[aria-label="Go to next month"]').click();
@@ -90,6 +92,7 @@ describe("Frontend Registration Tests", () => {
     cy.url().should("include", "/team/add");
     cy.contains("button", "Add").click();
     cy.get(".PhoneInputInput").type(TeamInfo.Longphone);
+    cy.contains("Phone number is too long").should("be.visible");
   });
 
   it("User already exists", () => {
@@ -101,7 +104,9 @@ describe("Frontend Registration Tests", () => {
     cy.get("#email").type("marwaazargui+JMA@gmail.com");
     cy.get(".PhoneInputInput").type(TeamInfo.phone);
 
-    cy.get('button[role="combobox"]').contains("Select a year").click({ force: true });
+    cy.get('button[role="combobox"]')
+      .contains("Select a year")
+      .click({ force: true });
     cy.get('[role="option"]').contains("1997").click({ force: true });
     cy.get('button[aria-haspopup="dialog"]').click();
     cy.contains("button", "14").click({ force: true });
@@ -110,9 +115,11 @@ describe("Frontend Registration Tests", () => {
     cy.get('[name="jobTitle"]').type(TeamInfo.jobtittle);
     cy.intercept("POST", `${apiUrl}/Staff`).as("AddStaff");
     cy.contains("button", "Add").click({ force: true });
-   cy.wait("@AddStaff").then((interception) => {
+    cy.wait("@AddStaff").then((interception) => {
       expect(interception.response?.statusCode).to.eq(400);
-      expect(interception.response?.body.message).to.eq("Email marwaazargui+JMA@gmail.com is already registered!");
+      expect(interception.response?.body.message).to.eq(
+        "Email marwaazargui+JMA@gmail.com is already registered!"
+      );
     });
   });
 
@@ -126,7 +133,9 @@ describe("Frontend Registration Tests", () => {
     cy.get("#email").type(TeamInfo.email);
     cy.get(".PhoneInputInput").type(TeamInfo.phone);
 
-    cy.get('button[role="combobox"]').contains("Select a year").click({ force: true });
+    cy.get('button[role="combobox"]')
+      .contains("Select a year")
+      .click({ force: true });
     cy.get('[role="option"]').contains("1997").click({ force: true });
     cy.get('button[aria-haspopup="dialog"]').click();
     cy.contains("button", "14").click({ force: true });
@@ -139,15 +148,29 @@ describe("Frontend Registration Tests", () => {
 
     // Step 2 Services
     cy.contains("Services").click({ force: true });
-    cy.get('button[role="checkbox"]', { timeout: 10000 }).should("be.visible").first().click();
-    cy.get('button[role="checkbox"]', { timeout: 10000 }).should("be.visible").eq(1).click();
+    cy.get('button[role="checkbox"]', { timeout: 10000 })
+      .should("be.visible")
+      .first()
+      .click();
+    cy.get('button[role="checkbox"]', { timeout: 10000 })
+      .should("be.visible")
+      .eq(1)
+      .click();
 
     // Step 3 Locations
     cy.contains("Locations").click({ force: true });
     cy.get('button[role="radio"]').first().click();
 
     // Last Step Working Hours
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
     const todayName = days[new Date().getDay()];
     const nextDay = days[(new Date().getDay() + 1) % 7];
 
@@ -157,20 +180,34 @@ describe("Frontend Registration Tests", () => {
       .find('button:contains("Add Time Slot")')
       .click();
 
-    cy.contains("label", "Start Time").parent().find('button[role="combobox"]').click();
+    cy.contains("label", "Start Time")
+      .parent()
+      .find('button[role="combobox"]')
+      .click();
     cy.get('[role="option"]').contains("9:00AM").click();
 
-    cy.contains("label", "End Time").parent().find('button[role="combobox"]').click();
+    cy.contains("label", "End Time")
+      .parent()
+      .find('button[role="combobox"]')
+      .click();
     cy.get('[role="option"]').contains("4:00PM").click();
 
-    cy.contains("label", "Start Time").parent().find('button[role="combobox"]').should("contain.text", "9:00AM");
-    cy.contains("label", "End Time").parent().find('button[role="combobox"]').should("contain.text", "4:00PM");
+    cy.contains("label", "Start Time")
+      .parent()
+      .find('button[role="combobox"]')
+      .should("contain.text", "9:00AM");
+    cy.contains("label", "End Time")
+      .parent()
+      .find('button[role="combobox"]')
+      .should("contain.text", "4:00PM");
 
     cy.intercept("POST", `${apiUrl}/Staff`).as("AddStaff");
     cy.contains("button", "Add").click({ force: true });
     cy.wait("@AddStaff").then((interception) => {
       expect(interception.response?.statusCode).to.eq(200);
-      expect(interception.response?.body.message).to.eq("Staff member created successfully");
+      expect(interception.response?.body.message).to.eq(
+        "Staff member created successfully"
+      );
     });
 
     cy.url().should("not.include", "/team/add");

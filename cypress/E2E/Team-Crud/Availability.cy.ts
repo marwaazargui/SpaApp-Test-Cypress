@@ -12,19 +12,21 @@ describe("Frontend Availability Tests (requires login)", () => {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   let auth: AuthData;
 
-  // Helper: Get today's section
+  // ================= Helper Functions =================
+
+  // Get today's section
   const getTodaySection = () => {
-    const today = new Date();
-    const todayName = days[today.getDay()];
+    const todayName = days[new Date().getDay()];
     return cy.contains("h3", todayName)
       .parents(".bg-white.rounded-xl")
       .as("todaySection");
   };
 
-  // Helper: Add a time slot
+  // Add a time slot
   const addTimeSlot = (startTime: string, endTime: string) => {
     cy.get("@todaySection").contains("button", "Add Time Slot").click({ force: true });
 
+    // Select start time
     cy.get("@todaySection")
       .find('button[role="combobox"]')
       .filter((_, el) => el.innerText.includes("Select start time"))
@@ -32,6 +34,7 @@ describe("Frontend Availability Tests (requires login)", () => {
       .click({ force: true });
     cy.get('[role="option"]').contains(startTime).click({ force: true });
 
+    // Select end time
     cy.get("@todaySection")
       .find('button[role="combobox"]')
       .filter((_, el) => el.innerText.includes("Select end time"))
@@ -39,6 +42,7 @@ describe("Frontend Availability Tests (requires login)", () => {
       .click({ force: true });
     cy.get('[role="option"]').contains(endTime).click({ force: true });
 
+    // Verify remove button exists
     cy.get("@todaySection")
       .contains("span", "Remove time slot")
       .parent("button")
@@ -46,7 +50,7 @@ describe("Frontend Availability Tests (requires login)", () => {
       .should("be.visible");
   };
 
-  // Helper: Remove all slots
+  // Remove all slots
   const removeAllSlots = () => {
     cy.get("@todaySection")
       .find("span")
@@ -55,30 +59,34 @@ describe("Frontend Availability Tests (requires login)", () => {
       .each(($btn) => cy.wrap($btn).click({ force: true }));
   };
 
+  // ================= Before Each =================
   beforeEach(() => {
     cy.fixture<AuthData>("Auth-dependencies/AuthData").then((data) => {
       auth = data;
 
-      // Login before running any test
+      // Login
       cy.visit("auth/login");
       cy.login(auth.validUser.email, auth.validUser.password);
 
       cy.url().should("include", "/dashboard");
       cy.contains("Dashboard").should("be.visible");
 
+      // Navigate to team page
       cy.intercept("GET", `${apiUrl}/Staff*`).as("getStaff");
       cy.visit("team");
-
       cy.url().should("include", "/team");
       cy.contains("Team members").should("be.visible");
       cy.wait("@getStaff").its("response.statusCode").should("eq", 200);
 
+      // Click Add team member
       cy.contains("button", "Add").click({ force: true });
       cy.url().should("include", "/team/add");
     });
   });
 
-  it("Add a single Time slot", () => {
+  // ================= Test Cases =================
+
+  it("Add a single time slot", () => {
     cy.contains("Availability time").click({ force: true });
     getTodaySection();
     addTimeSlot("9:00AM", "4:00PM");
@@ -96,7 +104,7 @@ describe("Frontend Availability Tests (requires login)", () => {
       .should("contain.text", "4:00PM");
   });
 
-  it("Add multiple Time slots", () => {
+  it("Add multiple time slots", () => {
     cy.contains("Availability time").click({ force: true });
     getTodaySection();
 
@@ -109,7 +117,7 @@ describe("Frontend Availability Tests (requires login)", () => {
     slots.forEach((slot) => addTimeSlot(slot.start, slot.end));
   });
 
-  it("Add two time slots, remove them, and check 'No working hours set'", () => {
+  it("Add two time slots, remove them, and verify 'No working hours set'", () => {
     cy.contains("Availability time").click({ force: true });
     getTodaySection();
 
@@ -121,13 +129,16 @@ describe("Frontend Availability Tests (requires login)", () => {
     cy.get("@todaySection").contains("No working hours set").should("exist");
   });
 
-  it("Availability Validation message", () => {
+  it("Availability validation message when saving without time slot", () => {
     cy.contains("Availability time").click({ force: true });
     cy.contains("h3", "Sunday")
       .parents(".bg-white.rounded-xl")
       .find('button:contains("Add Time Slot")')
-      .click();
-    cy.contains("button", "Add").click();
+      .click({ force: true });
+
+    // Click Add without selecting time
+    cy.contains("button", "Add").click({ force: true });
+
     cy.contains("Add working hours").should("be.visible");
   });
 });
